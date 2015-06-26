@@ -12,7 +12,7 @@ ENV OUTDIR		/out
 ENV TEMPDIR		/build/tmp
 ENV OPTFLAGS		-O2
 ENV DEPSDIR		/deps64
-ENV DIGITAlCOINDIR		/build/digitalcoin
+ENV DIGITALCOINDIR		/build/digitalcoin
 ENV DISTSRCDIR		/build64/distsrc
 ENV DISTBINDIR		/dist
 ENV BINDIR		/out/64
