@@ -12,7 +12,7 @@ ENV OUTDIR		/out
 ENV TEMPDIR		/build/tmp
 ENV OPTFLAGS		-O2
 ENV DEPSDIR		/deps64
-ENV BITCOINDIR		/build/bitcoin
+ENV DIGITAlCOINDIR		/build/digitalcoin
 ENV DISTSRCDIR		/build64/distsrc
 ENV DISTBINDIR		/dist
 ENV BINDIR		/out/64
@@ -20,7 +20,7 @@ ENV BINDIR		/out/64
 WORKDIR /build
 
 RUN mkdir -p $ROOTDIR $INSTALLPREFIX $BUILDDIR $OUTDIR $TEMPDIR $INPUTS $INSTALLPREFIX/host/bin \
-    	     $DEPSDIR $BINDIR $BITCOINDIR $DISTSRCDIR $DISTBINDIR
+    	     $DEPSDIR $BINDIR $DIGITALCOINDIR $DISTSRCDIR $DISTBINDIR
 
 RUN apt-get -qq update && \
     apt-get install -qqy mingw-w64 g++-mingw-w64 git-core unzip nsis \
@@ -241,31 +241,31 @@ RUN { \
     make && make install; \
     }
 
-WORKDIR /build/bitcoin
+WORKDIR /build/digitalcoin
 RUN { \
-    git clone https://github.com/bitcoin/bitcoin.git . && \
+    git clone https://github.com/DGCDev/digitalcoin.git . && \
     ./autogen.sh && \
-    ./configure --bindir=$OUTDIR --prefix=$INSTALLPREFIX --host=$HOST --with-qt-plugindir=$INSTALLPREFIX/plugins  --with-qt-incdir=$INSTALLPREFIX/include --with-qt-bindir=$INSTALLPREFIX/host/bin --with-boost=$INSTALLPREFIX --disable-maintainer-mode --with-protoc-bindir=$INSTALLPREFIX/host/bin --disable-dependency-tracking CPPFLAGS="-I$INSTALLPREFIX/include ${OPTFLAGS}" LDFLAGS="-L$INSTALLPREFIX/lib ${OPTFLAGS}" CXXFLAGS="-frandom-seed=bitcoin ${OPTFLAGS}" && \
+    ./configure --bindir=$OUTDIR --prefix=$INSTALLPREFIX --host=$HOST --with-qt-plugindir=$INSTALLPREFIX/plugins  --with-qt-incdir=$INSTALLPREFIX/include --with-qt-bindir=$INSTALLPREFIX/host/bin --with-boost=$INSTALLPREFIX --disable-maintainer-mode --with-protoc-bindir=$INSTALLPREFIX/host/bin --disable-dependency-tracking CPPFLAGS="-I$INSTALLPREFIX/include ${OPTFLAGS}" LDFLAGS="-L$INSTALLPREFIX/lib ${OPTFLAGS}" CXXFLAGS="-frandom-seed=digitalcoin ${OPTFLAGS}" && \
     make dist; \
     }
 
 WORKDIR /build64/distsrc
 RUN { \
-    tar --strip-components=1 -xf /build/bitcoin/`echo bitcoin-*.tar.gz` && \
-    ./configure --enable-upnp-default --bindir=$BINDIR --prefix=$INSTALLPREFIX --host=$HOST --with-qt-plugindir=$INSTALLPREFIX/plugins  --with-qt-incdir=$INSTALLPREFIX/include --with-qt-bindir=$INSTALLPREFIX/host/bin --with-boost=$INSTALLPREFIX --disable-maintainer-mode --with-protoc-bindir=$INSTALLPREFIX/host/bin --disable-dependency-tracking CPPFLAGS="-I$INSTALLPREFIX/include ${OPTFLAGS}" LDFLAGS="-L$INSTALLPREFIX/lib ${OPTFLAGS}" CXXFLAGS="-frandom-seed=bitcoin ${OPTFLAGS}" && \
+    tar --strip-components=1 -xf /build/digitalcoin/`echo digitalcoin-*.tar.gz` && \
+    ./configure --enable-upnp-default --bindir=$BINDIR --prefix=$INSTALLPREFIX --host=$HOST --with-qt-plugindir=$INSTALLPREFIX/plugins  --with-qt-incdir=$INSTALLPREFIX/include --with-qt-bindir=$INSTALLPREFIX/host/bin --with-boost=$INSTALLPREFIX --disable-maintainer-mode --with-protoc-bindir=$INSTALLPREFIX/host/bin --disable-dependency-tracking CPPFLAGS="-I$INSTALLPREFIX/include ${OPTFLAGS}" LDFLAGS="-L$INSTALLPREFIX/lib ${OPTFLAGS}" CXXFLAGS="-frandom-seed=digitalcoin ${OPTFLAGS}" && \
     make $MAKEOPTS && make deploy && make install-strip && \
-    cp -f bitcoin-*setup*.exe $BINDIR/; \
+    cp -f digitalcoin-*setup*.exe $BINDIR/; \
     }
 
 # sort distribution tar file and normalize user/group/mtime information for deterministic output
-WORKDIR /build/bitcoin
+WORKDIR /build/digitalcoin
 RUN { \
-    DISTNAME=`echo bitcoin-*.tar.gz` && \
+    DISTNAME=`echo digitalcoin-*.tar.gz` && \
     mkdir -p $OUTDIR/src && \
     rm -rf $TEMPDIR && \
     mkdir -p $TEMPDIR && \
     cd $TEMPDIR && \
-    tar -xvf /build/bitcoin/$DISTNAME | sort | tar --no-recursion -cT /dev/stdin --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 | gzip -n > $OUTDIR/src/$DISTNAME; \
+    tar -xvf /build/digitalcoin/$DISTNAME | sort | tar --no-recursion -cT /dev/stdin --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 | gzip -n > $OUTDIR/src/$DISTNAME; \
     }
 
 # copy the final files to the dist folder
